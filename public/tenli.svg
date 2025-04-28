@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="503.75256"
+   height="180.86581"
+   viewBox="0 0 133.28453 47.85408"
+   version="1.1"
+   id="svg337"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="tenli.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview339"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2"
+     inkscape:cx="319.75"
+     inkscape:cy="194.5"
+     inkscape:window-width="2560"
+     inkscape:window-height="1369"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs334" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-11.115956,-6.7684193)">
+    <rect
+       style="opacity:1;fill:none;fill-opacity:0.74902;stroke:#000000;stroke-width:2.5;stroke-linejoin:miter;stroke-dasharray:none"
+       id="rect451"
+       width="45.35408"
+       height="45.35408"
+       x="12.365956"
+       y="8.0184193"
+       ry="6.4271827" />
+    <g
+       aria-label="10"
+       transform="scale(1.0103203,0.98978512)"
+       id="text2063"
+       style="font-weight:bold;font-size:32.3976px;-inkscape-font-specification:'sans-serif Bold';letter-spacing:-3.32845px;opacity:1;stroke-width:1.5306"
+       inkscape:label="10Text">
+      <path
+         d="M 29.855505,19.448455 V 42.52858 H 25.315412 V 24.700409 l -5.473423,1.740106 V 22.84957 l 9.538942,-3.401115 z"
+         style="font-family:Roboto;-inkscape-font-specification:'Roboto Bold'"
+         id="path4137" />
+      <path
+         d="m 49.528085,28.987396 v 3.986423 q 0,2.594339 -0.55367,4.476817 -0.55367,1.866658 -1.597733,3.068913 -1.028244,1.186435 -2.451967,1.755924 -1.423723,0.56949 -3.163828,0.56949 -1.392084,0 -2.594339,-0.348022 -1.202254,-0.36384 -2.167222,-1.123158 -0.949148,-0.759319 -1.645191,-1.914116 -0.680223,-1.170617 -1.044063,-2.784169 -0.36384,-1.613552 -0.36384,-3.701679 v -3.986423 q 0,-2.594339 0.55367,-4.445178 0.569489,-1.866659 1.597733,-3.053094 1.044063,-1.186436 2.467786,-1.740106 1.423722,-0.569489 3.163828,-0.569489 1.392084,0 2.57852,0.363841 1.202254,0.348021 2.167222,1.09152 0.964967,0.7435 1.64519,1.914116 0.680223,1.154797 1.044063,2.76835 0.363841,1.597733 0.363841,3.67004 z m -4.571732,4.587551 V 28.37045 q 0,-1.249712 -0.142372,-2.183042 -0.126553,-0.933329 -0.395478,-1.581914 -0.268926,-0.664404 -0.664404,-1.075701 -0.395479,-0.411298 -0.901691,-0.601127 -0.506213,-0.18983 -1.123159,-0.18983 -0.775138,0 -1.376265,0.300564 -0.585309,0.300563 -0.996606,0.964967 -0.411298,0.648585 -0.632766,1.740105 -0.205649,1.075702 -0.205649,2.625978 v 5.204497 q 0,1.249712 0.126554,2.19886 0.142372,0.949148 0.411297,1.629371 0.284745,0.664404 0.664404,1.091521 0.395479,0.411298 0.901691,0.601127 0.522032,0.18983 1.138978,0.18983 0.759319,0 1.344627,-0.300564 0.601127,-0.316382 1.012425,-0.980786 0.427117,-0.680223 0.632765,-1.771744 0.205649,-1.091521 0.205649,-2.657615 z"
+         style="font-family:Roboto;-inkscape-font-specification:'Roboto Bold'"
+         id="path4139" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:38.8056px;font-family:Roboto;-inkscape-font-specification:'Roboto Semi-Bold';letter-spacing:-0.926042px;fill:#000000;fill-opacity:1;stroke-width:2"
+       x="66.400673"
+       y="45.0895"
+       id="text1635"
+       inkscape:label="TenliText"><tspan
+         sodipodi:role="line"
+         id="tspan1633"
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:38.8056px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#000000;fill-opacity:1;stroke-width:2"
+         x="66.400673"
+         y="45.0895">Tenli</tspan></text>
+  </g>
+</svg>
