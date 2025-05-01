@@ -23,6 +23,6 @@ export async function POST(request: Request) {
         },
     });
 
-    console.log("Received data:", { title, author: authorId ? authorId : authorName, items });
+    // console.log("Received data:", { title, author: authorId ? authorId : authorName, items });
     return new Response("Data received", { status: 200 });
 }

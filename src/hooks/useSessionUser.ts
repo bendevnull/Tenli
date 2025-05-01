@@ -18,7 +18,7 @@ export function useSessionUser() {
                 const response = await fetch("/api/auth/user");
                 if (response.ok) {
                     const data = await response.json();
-                    console.log("Session data:", data);
+                    // console.log("Session data:", data);
                     setUser(data);
                 } else {
                     setUser(null);

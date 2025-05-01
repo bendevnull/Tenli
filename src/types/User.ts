@@ -2,20 +2,21 @@ import { Roles } from "./Roles";
 
 export type User = {
     id: string;
-    role: Roles;
     name: string | null;
-    email: string | null;
+    image: string | null;
+    role: Roles;
+    createdLists: any[];
+    responses: any[];
+    createdListCount: number;
+    responseCount: number;
     createdAt: Date;
     updatedAt: Date;
-    image: string | null;
-    createdLists: List[];
-    responses: Response[];
-};
+}
 
 export type List = {
     id: string;
     name: string;
-    author: User;
+    author?: User;
     createdAt: Date;
     updatedAt: Date;
     responses: Response[];

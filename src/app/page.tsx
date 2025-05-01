@@ -4,8 +4,9 @@ import animations from "@/styles/animations.module.css";
 
 export default async function Home() {
     // Fetch random lists from the database
+    
     const res = await fetch(`${process.env.AUTH_URL}/api/lists?limit=3&random=true`);
-    const lists = await res.json();
+    const lists: any[] = await res.json();
     return (
         <>
             <div className="flex flex-col items-center justify-center px-12 py-16 bg-white relative text-center">
@@ -16,7 +17,7 @@ export default async function Home() {
             </div>
             <div className="px-12 py-16 bg-gray-50">
                 <h2 className={`text-2xl font-bold text-gray-800 mb-8 ${animations.fadeIn}`}>Random Lists</h2>
-                <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 ${animations.fadeIn}`}>
+                <div className={`grid grid-cols-1 lg:grid-cols-3 gap-8 ${animations.fadeIn}`}>
                     {lists.length === 0 ? (
                         <p className="text-lg text-gray-600">No lists available.</p>
                     ) : (
@@ -26,7 +27,7 @@ export default async function Home() {
                     )}
                 </div>
             </div>
-            <footer className="bg-gray-100 py-8 px-12">
+            <footer className="bg-gray-100 py-8 px-12 flex flex-grow flex-col justify-center items-center">
                 <div className="flex flex-col items-center">
                     <div className="mb-2">
                         <p className="text-sm text-gray-600">

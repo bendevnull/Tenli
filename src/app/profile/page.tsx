@@ -1,11 +1,10 @@
-"use client";;
+"use client";
 import { useSessionUser } from "@/hooks/useSessionUser";
 import { use, useEffect, useState } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { redirect, useSearchParams } from "next/navigation";
-import { List } from "@/types/User";
+import { List, User } from "@/types/User";
 import ListComponent from "@/components/List";
-import { APIUser } from "../api/user/route";
 
 enum BadgeColor {
     Red = "bg-red-100 text-red-800",
@@ -101,7 +100,7 @@ function Badge({ text, color = BadgeColor.Blue, className }: { text: string, col
     )
 }
 
-function Lists({ user, possessive }: { user: APIUser, possessive: string }) {
+function Lists({ user, possessive }: { user: User, possessive: string }) {
     return (
         <div className="md:w-3/4 w-full bg-white p-4 rounded shadow-md">
             <h2 className="text-xl font-semibold mb-4">{possessive} Lists</h2>
@@ -118,7 +117,7 @@ function Lists({ user, possessive }: { user: APIUser, possessive: string }) {
     )
 }
 
-function UserBadges({ user }: { user: APIUser }) {
+function UserBadges({ user }: { user: User }) {
     // The administrator and moderator badges are calculated from the role of the user
     // Other badges will (in the future) be stored in the database and be available on the APIUser type
     const badges: { text: string, color: BadgeColor }[] = [];
@@ -141,7 +140,7 @@ function UserBadges({ user }: { user: APIUser }) {
     );
 }
 
-function UserInfo({ user }: { user: APIUser }) {
+function UserInfo({ user }: { user: User }) {
     return (
         <div className="md:w-1/4 w-full bg-white p-4 rounded shadow-md">
             <img src={`${user.image}?size=1024`} alt="Profile" className="rounded-4xl border-3 border-gray-200 mb-4" />
@@ -152,16 +151,15 @@ function UserInfo({ user }: { user: APIUser }) {
             <p className="text-gray-600"><strong>Lists Created: </strong>{user.createdListCount}</p>
             <p className="text-gray-600"><strong>Responses: </strong>{user.responseCount}</p>
             <Separator />
-            <div className="sm:inline-flex lg:inline-flex md:flex-col items-center gap-2 text-sm text-gray-600">
+            <div className="flex-col items-center gap-2 text-gray-600">
                 <p className="text-gray-600"><strong>Followers: </strong>Coming Soon</p>
-                <span className="visible md:hidden text-gray-400">|</span>
                 <p className="text-gray-600"><strong>Following: </strong>Coming Soon</p>
             </div>
         </div>
     )
 }
 
-function Responses({ user, possessive }: { user: APIUser, possessive: string }) {
+function Responses({ user, possessive }: { user: User, possessive: string }) {
     return (
         <div className="container mx-auto p-4 flex flex-col gap-4">
             <div className="w-full bg-white p-4 mb-4 rounded shadow-md">
@@ -169,7 +167,7 @@ function Responses({ user, possessive }: { user: APIUser, possessive: string }) 
                 { user.responses.length === 0 ? (
                     <p className="text-gray-600">No responses yet.</p>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 ">
                         {user.responses.map((response: any) => (
                             <ListComponent key={response.id} list={response.list} author={user} />
                         ))}
@@ -186,7 +184,7 @@ export default function ProfilePage() {
     const name = searchParams?.get("name");
     const id = searchParams?.get("id");
 
-    const [user, setUser] = useState<APIUser | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const session = useSessionUser();
     const [loading, setLoading] = useState(true);
 
@@ -229,7 +227,7 @@ export default function ProfilePage() {
         return <p>User not found.</p>;
     }
 
-    function calculatePossessive(user: APIUser, sessionUser: APIUser) {
+    function calculatePossessive(user: User, sessionUser: User) {
         if (user.id === sessionUser.id) return "My";
         return user.name + "'s";
     }

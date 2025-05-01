@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/bendevnull/Tenli/refs/heads/master/public/tenli.svg" height=100/>
+<img src="https://raw.githubusercontent.com/bendevnull/Tenli/refs/heads/master/public/tenli-light.svg" height=100/>
 
 ## Your collection of top ten lists
 ------

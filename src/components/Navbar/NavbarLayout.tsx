@@ -3,34 +3,66 @@ import { useState } from "react";
 import NavDropdownButton from "./NavDropdownButton";
 import "@/styles/size.css";
 
+function HomeLink() {
+    return (
+        <a href="/" className="hover:text-gray-600 active:text-gray-600">Home</a>
+    )
+}
+
+function ListsLink() {
+    return (
+        <a href="/lists" className="hover:text-gray-600 active:text-gray-600">Lists</a>
+    )
+}
+
+function Logo() {
+    return (
+        <a href="/" className="absolute left-1/2 transform -translate-x-1/2">
+            <img src="/tenli.svg" alt="Logo" className="h-8" />
+        </a>
+    )
+}
+
+function CreateListLink() {
+    return (
+        <a href="/lists/create" className="hover:text-gray-600 active:text-gray-600">Create List</a>
+    )
+}
+
+function UserLink({ session }: { session: any }) {
+    return (
+        <>
+            {session?.user ? (
+                <div className="relative">
+                    <NavDropdownButton user={session.user} />
+                </div>
+            ) : (
+                <a href="/login" className="hover:text-gray-600 active:text-gray-600">Login</a>
+            )}
+        </>
+    )
+}
+
 export default function NavbarLayout({ session }: { session: any }) {
     // const { width } = useWindowDimensions();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
         <>
-            <nav className="bg-white text-gray-800 p-4 relative z-1000 desktop-only">
+            <nav className="bg-white text-gray-800 p-4 relative z-1000 hidden md:block">
                 <div className="container mx-auto flex items-center">
                     <div className="flex flex-1 justify-evenly">
-                        <a href="/" className="hover:text-gray-600">Home</a>
-                        <a href="/lists" className="hover:text-gray-600">Lists</a>
+                        <HomeLink />
+                        <ListsLink />
                     </div>
-                    <a href="/" className="absolute left-1/2 transform -translate-x-1/2">
-                        <img src="/tenli.svg" alt="Logo" className="h-8" />
-                    </a>
+                    <Logo />
                     <div className="flex flex-1 justify-evenly">
-                        <a href="/lists/create" className="hover:text-gray-600">Create List</a>
-                        {session?.user ? (
-                            <div className="relative">
-                                <NavDropdownButton user={session.user} />
-                            </div>
-                        ) : (
-                            <a href="/login" className="hover:text-gray-600">Login</a>
-                        )}
+                        <CreateListLink />
+                        <UserLink session={session} />
                     </div>
                 </div>
             </nav>
-            <nav className="bg-white text-gray-800 p-4 relative z-1000 mobile-only">
+            <nav className="bg-white text-gray-800 p-4 relative z-1000 md:hidden">
                 <div className="container mx-auto flex items-center justify-between">
                     <a href="/" className="absolute left-1/2 transform -translate-x-1/2">
                         <img src="/tenli.svg" alt="Logo" className="h-8" />
