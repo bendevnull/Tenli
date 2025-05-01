@@ -2,74 +2,94 @@ import { prisma } from "@/lib/prisma";
 import { roleFromString, Roles } from "@/types/Roles";
 import { User } from "@/types/User";
 
-// export type APIUser = {
-//     id: string;
-//     name: string | null;
-//     image: string | null;
-//     role: Roles;
-//     createdLists: any[];
-//     responses: any[];
-//     createdListCount: number;
-//     responseCount: number;
-//     createdAt: Date;
-//     updatedAt: Date;
-// }
-
 export async function getUser(userId?: string | null, userName?: string | null): Promise<User | null> {
-    const user = await prisma.user.findFirst({
-        where: {
-            OR: [
-                { id: userId || undefined },
-                { name: {
-                    equals: userName || undefined,
-                    mode: "insensitive"
-                }},
-            ],
-        },
-        omit: {
-            email: true,
-            emailVerified: true,
-        },
-        include: {
-            createdLists: {
-                orderBy: { createdAt: "desc" },
-                omit: {
-                    authorId: true,
+    const [ user, createdListCount, responseCount ] = await prisma.$transaction([
+        prisma.user.findFirst({
+            where: {
+                OR: [
+                    { id: userId || undefined },
+                    { name: {
+                        equals: userName || undefined,
+                        mode: "insensitive"
+                    }},
+                ],
+            },
+            omit: {
+                email: true,
+                emailVerified: true,
+            },
+            include: {
+                createdLists: {
+                    orderBy: { createdAt: "desc" },
+                    omit: {
+                        authorId: true,
+                    },
+                    include: {
+                        responses: {
+                            where: {
+                                OR: [
+                                    { user: {
+                                        name: {
+                                            equals: userName || undefined
+                                        }
+                                    } },
+                                    { userId: userId || undefined }
+                                ]
+                            }
+                        },
+                    },
+                    take: 3,
                 },
-                include: {
-                    responses: {
-                        where: {
-                            OR: [
-                                { user: {
-                                    name: {
-                                        equals: userName || undefined
-                                    }
-                                } },
-                                { userId: userId || undefined }
-                            ]
+                responses: {
+                    orderBy: { createdAt: "desc" },
+                    where: {
+                        NOT: {
+                            list: {
+                                authorId: userId || undefined,
+                                author: { name: userName || undefined }
+                            }
                         }
                     },
+                    include: {
+                        list: true,
+                    },
+                    omit: {
+                        listId: true,
+                    },
+                    take: 5,
                 },
             },
-            responses: {
-                orderBy: { createdAt: "desc" },
-                where: {
-                    NOT: {
-                        list: {
-                            authorId: userId || undefined,
-                            author: { name: userName || undefined }
-                        }
+        }),
+        prisma.list.count({
+            where: {
+                author: {
+                    id: {
+                        equals: userId || undefined
+                    },
+                    name: {
+                        equals: userName || undefined,
+                        mode: "insensitive"
                     }
-                },
-                include: {
-                    list: true,
-                },
-                omit: {
-                    listId: true,
                 }
             },
-        },
-    });
+        }),
+        prisma.response.count({
+            where: {
+                OR: [
+                    { userId: userId || undefined },
+                    { user: { name: { equals: userName || undefined, mode: "insensitive" } } }
+                ],
+                NOT: {
+                    list: {
+                        OR: [
+                            { authorId: userId || undefined },
+                            { author: { name: { equals: userName || undefined, mode: "insensitive" } } }
+                        ]
+                    }
+                }
+            },
+        })
+    ]);
 
     if (!user) return null;
     
@@ -78,20 +98,21 @@ export async function getUser(userId?: string | null, userName?: string | null):
         name: user.name || null,
         image: user.image || null,
         role: roleFromString(user.role) || Roles.USER,
-        createdLists: user.createdLists.slice(0, 3),
-        responses: user.responses.slice(0, 5),
-        createdListCount: user.createdLists.length,
-        responseCount: user.responses.length,
+        createdLists: user.createdLists,
+        responses: user.responses,
+        createdListCount,
+        responseCount,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
     } as User
 }
 
 export async function GET(req: Request) {
-    const userId = new URL(req.url).searchParams.get("id");
-    const userName = new URL(req.url).searchParams.get("name");
-    const exclude = new URL(req.url).searchParams.get("exclude");
-    const include = new URL(req.url).searchParams.get("include");
+    const searchParams = new URL(req.url).searchParams;
+    const userId = searchParams.get("id");
+    const userName = searchParams.get("name");
+    const exclude = searchParams.get("exclude");
+    const include = searchParams.get("include");
 
     if (!userId && !userName) {
         return new Response("User ID or name is required", { status: 400 });

@@ -48,7 +48,7 @@ export default function NavDropdownButton({ user }: { user: any }) {
             {isOpen && (
                 <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 min-w-[8rem] bg-white border border-gray-300 rounded shadow-lg z-50">
                     <a href="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-center">Profile</a>
-                    <a href="/settings" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-center">Settings</a>
+                    <span className="block px-4 py-2 text-gray-400 text-center cursor-not-allowed">Settings</span>
                     <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-center">Logout</a>
                 </div>
             )}

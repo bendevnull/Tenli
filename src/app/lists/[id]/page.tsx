@@ -10,7 +10,7 @@ export default function ListPage({ params }: { params: { id: string } }) {
     const [list, setList] = useState<List | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const { user, userLoading } = useSessionUser();
+    const { user: sessionUser, userLoading } = useSessionUser();
 
     useEffect(() => {
         async function unwrapParams() {
@@ -57,9 +57,11 @@ export default function ListPage({ params }: { params: { id: string } }) {
                 <div className="w-full bg-white p-4 mb-4 rounded shadow-md">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-2xl font-semibold">Responses</h2>
-                        <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 active:bg-blue-600">
-                            Add Response
-                        </button>
+                        { sessionUser && sessionUser.id !== list.author?.id && (
+                            <button className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-600 active:bg-blue-700">
+                                Add Response
+                            </button>
+                        )}
                     </div>
                     {list.responses.length <= 1 ? (
                         <p className="text-gray-600">No responses yet.</p>

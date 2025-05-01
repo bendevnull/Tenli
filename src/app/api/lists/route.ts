@@ -1,5 +1,7 @@
 import { NextApiRequest } from "next";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 
 const MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 12;
@@ -67,4 +69,53 @@ export async function GET(request: NextApiRequest) {
     }
 
     return new Response(JSON.stringify(lists), { status: 200, headers: { "Content-Type": "application/json" } });
+}
+
+export async function POST(request: Request) {
+    const session = await auth();
+
+    const formData = await request.formData();
+    const title = formData.get("title") as string;
+    const authorId = session?.user?.id || null;
+    const items = Array.from({ length: 10 }, (_, i) => formData.get(`item${i + 1}`) as string);
+
+    if (!title || !items.length) {
+        return new Response("Title and items are required", { status: 400 });
+    }
+    if (items.length > 10 || items.length < 10) {
+        return new Response("You must add 10 items", { status: 400 });
+    }
+    if (items.some(item => item.length < 3)) {
+        return new Response("Each item must be at least 3 characters long", { status: 400 });
+    }
+    if (!authorId) {
+        return new Response("You must be logged in to create a list", { status: 401 });
+    }
+    if (title.length < 3) {
+        return new Response("Title must be at least 3 characters long", { status: 400 });
+    }
+    if (title.length > 100) {
+        return new Response("Title must be less than 100 characters", { status: 400 });
+    }
+    if (items.some(item => item.length > 100)) {
+        return new Response("Each item must be less than 100 characters", { status: 400 });
+    }
+
+    const list = await prisma.list.create({
+        data: {
+            name: title,
+            authorId: authorId || undefined,
+        },
+    });
+
+    await prisma.response.create({
+        data: {
+            content: JSON.stringify(items),
+            listId: list.id,
+            userId: authorId || undefined,
+        },
+    });
+
+    // console.log("Received data:", { title, author: authorId ? authorId : authorName, items });
+    return redirect(`/lists/${list.id}`);
 }

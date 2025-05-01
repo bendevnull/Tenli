@@ -208,6 +208,7 @@ export default function ProfilePage() {
             }
 
             const data = await response.json();
+            console.log("User data:", data);
             setUser(data);
             setLoading(false);
         }

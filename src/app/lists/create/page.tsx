@@ -38,45 +38,40 @@ export default function CreateListPage() {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-white p-6 text-gray-800">
-            <form action="/api/lists/create" method="POST" onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="List Title"
-                    name="title"
-                    className="w-full max-w-md p-3 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {error && <p className="text-red-500 mb-4">{error}</p>}
-                {user ? (
-                    <input
-                        type="hidden"
-                        name="authorId"
-                        value={user.id}
-                    />
-                ) : (
-                    <input
-                        type="text"
-                        placeholder="Author Name"
-                        name="authorName"
-                        className="w-full max-w-md p-3 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                )}
-                {[...Array(10)].map((_, index) => (
-                    <input
-                        key={index}
-                        type="text"
-                        placeholder={`Item ${index + 1}`}
-                        name={`item${index + 1}`}
-                        className="w-full max-w-md p-3 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                ))}
-                <button
-                    type="submit"
-                    className="w-full max-w-md p-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
-                >
-                    Create List
-                </button>
-            </form>
+        <div className="flex flex-col flex-grow bg-gray-100 justify-center items-center">
+            <form action="/api/lists" method="post" className="w-full max-w-[480px]" onSubmit={handleSubmit}>
+                    <div className="p-4 border border-gray-300 rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-200 w-full">
+                        <h3 className="text-xl font-bold mb-2">Create a new list</h3>
+                        {error && <p className="text-red-500">{error}</p>}
+                        <input
+                            type="text"
+                            name="title"
+                            placeholder="List title"
+                            className="w-full p-2 border border-gray-300 rounded mb-4"
+                            required
+                        />
+                        { [...Array(10)].map((_, index) => (
+                            <div key={index} className="flex items-center mb-4 w-full">
+                                <span className="mr-2 w-6 text-right">{index + 1}.</span>
+                                <div className="w-full">
+                                    <input
+                                        type="text"
+                                        name={`item${index + 1}`}
+                                        placeholder={`Item ${index + 1}`}
+                                        className="w-full p-2 border border-gray-300 rounded"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        )) }
+                        <button
+                            type="submit"
+                            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
+                        >
+                            Create List
+                        </button>
+                    </div>
+                </form>
         </div>
     );
 }
