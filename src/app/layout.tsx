@@ -13,30 +13,57 @@ const geistMono = Geist_Mono({
     subsets: ["latin"],
 });
 
+// export const metadata: Metadata = {
+//     // metadataBase: new URL(process.env.NODE_ENV === "development" ? "https://beta.tenliapp.com" : "https://tenliapp.com"),
+//     title: `Tenli${process.env.NODE_ENV === "development" ? " (Development Beta)" : ""}`,
+//     // icons: {
+//     //     icon: "/tenli-square.png",
+//     //     shortcut: "/tenli-square.png",
+//     //     apple: "/tenli-square.png",
+//     // },
+//     openGraph: {
+//         type: "website",
+//         title: `Tenli${process.env.NODE_ENV === "development" ? " (Development Beta)" : ""}`,
+//         description: "Your collection of top ten lists. This is a test. This is a test. This is a test. This is a test. This is a test. This is a test. This is a test. This is a test. This is a test. This is a test. This is a test. This is a test. This is a test. 41123",
+//         url: process.env.NODE_ENV === "development" ? "https://beta.tenliapp.com" : "https://tenliapp.com",
+//         siteName: "Tenli",
+//         images: [
+//             {
+//                 url: "/tenli-square.png",
+//                 width: 512,
+//                 height: 512,
+                
+//             },
+//         ],
+//     },
+// };
+
 export const metadata: Metadata = {
-    metadataBase: new URL(process.env.NODE_ENV === "development" ? "https://beta.tenliapp.com" : "https://tenliapp.com"),
-    title: `Tenli${process.env.NODE_ENV === "development" ? " (Development Beta)" : ""}`,
-    description: "Your collection of top ten lists",
-    icons: {
-        icon: "/tenli-square.png",
-        shortcut: "/tenli-square.png",
-        apple: "/tenli-square.png",
+    metadataBase: new URL(
+        process.env.NODE_ENV === "development"
+            ? "https://beta.tenliapp.com"
+            : "https://tenliapp.com"
+    ),
+    title: {
+        default: `Tenli${
+            process.env.NODE_ENV === "development" ? " (Development Beta)" : ""
+        }`,
+        template: `%s | Tenli${
+            process.env.NODE_ENV === "development" ? " (Development Beta)" : ""
+        }`,
     },
     openGraph: {
+        // type: "website",
         title: `Tenli${process.env.NODE_ENV === "development" ? " (Development Beta)" : ""}`,
-        description: "Your collection of top ten lists",
+        description: "Your collection of top ten lists.",
         url: process.env.NODE_ENV === "development" ? "https://beta.tenliapp.com" : "https://tenliapp.com",
         siteName: "Tenli",
-        images: [
-            {
-                url: "/tenli-square.png",
-                width: 965,
-                height: 965,
-                
-            },
-        ],
+        images: [{ url: "/tenli-square.png" }],
     },
-};
+    twitter: {
+        card: "summary",
+    }
+}
 
 export default function RootLayout({
     children,

@@ -34,7 +34,7 @@ export default function CreateListPage() {
 
     if (!user && !userLoading) {
         // redirect to login if user is not authenticated
-        return redirect("/login");
+        return redirect("/login?redirect=/lists/create");
     }
 
     return (
