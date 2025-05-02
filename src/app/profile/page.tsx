@@ -3,7 +3,7 @@ import { useSessionUser } from "@/hooks/useSessionUser";
 import { use, useEffect, useState } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { redirect, useSearchParams } from "next/navigation";
-import { List, User } from "@/types/User";
+import { Badge, List, User } from "@/types/User";
 import ListComponent from "@/components/List";
 
 enum BadgeColor {
@@ -34,7 +34,7 @@ enum BadgeColor {
 }
 
 function badgeColorFromString(color: string): BadgeColor {
-    switch (color) {
+    switch (color.toLowerCase()) {
         case "red":
             return BadgeColor.Red;
         case "orange":
@@ -92,7 +92,7 @@ function Separator() {
     return <hr className="border border-gray-200 my-4 rounded" />
 }
 
-function Badge({ text, color = BadgeColor.Blue, className }: { text: string, color?: BadgeColor, className?: string }) {
+function BadgeComponent({ text, color = BadgeColor.Blue, className }: { text: string, color?: BadgeColor, className?: string }) {
     return (
         <span className={`inline-block ${color} text-xs font-semibold px-2.5 py-0.5 rounded-full mr-2 mb-2 ${className}`}>
             {text}
@@ -109,7 +109,7 @@ function Lists({ user, possessive }: { user: User, possessive: string }) {
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4">
                     {user.createdLists.map((list: List) => (
-                        <ListComponent key={list.id} list={list} author={user} />
+                        <ListComponent key={list.id} list={list} author={user} response={list.responses[0]} />
                     ))}
                 </div>
             )}
@@ -127,14 +127,25 @@ function UserBadges({ user }: { user: User }) {
             badges.push({ text: "Administrator", color: BadgeColor.Red });
             break;
         case "MODERATOR":
-            badges.push({ text: "Moderator", color: BadgeColor.Blue });
+            badges.push({ text: "Moderator", color: BadgeColor.Amber });
             break;
+    }
+
+    // Add badges based on user properties
+    if (user.createdListCount > 20) badges.push({ text: "Top List Creator", color: BadgeColor.Green });
+    if (user.responseCount > 20) badges.push({ text: "Top Responder", color: BadgeColor.Orange });
+
+    // Add custom badges from user.badges
+    if (user.badges) {
+        user.badges.forEach((badge: Badge) => {
+            badges.push({ text: badge.content, color: badgeColorFromString(badge.color) });
+        });
     }
     
     return (
         <div className="flex flex-wrap">
             {badges.map((badge, index) => (
-                <Badge key={index} text={badge.text} color={badge.color} className={index > 0 ? "ml-1 lg:visible md:invisible sm:visible" : undefined} />
+                <BadgeComponent key={index} text={badge.text} color={badge.color} className={index > 0 ? "ml-1 lg:visible md:invisible sm:visible" : undefined} />
             ))}
         </div>
     );
@@ -169,7 +180,7 @@ function Responses({ user, possessive }: { user: User, possessive: string }) {
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 ">
                         {user.responses.map((response: any) => (
-                            <ListComponent key={response.id} list={response.list} author={user} />
+                            <ListComponent key={response.id} list={response.list} response={response} />
                         ))}
                     </div>
                 )}

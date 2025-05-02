@@ -6,10 +6,33 @@ import { auth } from "@/lib/auth";
 const MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 12;
 
+// Define a constant for the common Prisma include object
+const PRISMA_INCLUDE = {
+    responses: {
+        include: {
+            user: {
+                omit: {
+                    email: true,
+                    emailVerified: true,
+                },
+            },
+        },
+        omit: {
+            userId: true,
+        },
+    },
+    author: {
+        omit: {
+            email: true,
+            emailVerified: true,
+        },
+    },
+};
+
 async function getAuthorLists(authorId: string, limit: number, validSearch: string | null, random: boolean) {
     const authorLists = await prisma.list.findMany({
         where: { authorId: { equals: authorId } },
-        include: { responses: true, author: true }
+        include: PRISMA_INCLUDE
     });
 
     if (random) {
@@ -26,7 +49,7 @@ async function getAuthorLists(authorId: string, limit: number, validSearch: stri
 }
 
 async function getRandomLists(limit: number) {
-    const dbLists = await prisma.list.findMany({ take: MAX_LIMIT, include: { responses: true, author: true } });
+    const dbLists = await prisma.list.findMany({ take: MAX_LIMIT, include: PRISMA_INCLUDE });
     return dbLists.sort(() => 0.5 - Math.random()).slice(0, limit);
 }
 
@@ -35,7 +58,7 @@ async function getSearchedLists(validSearch: string, limit: number) {
         where: {
             name: { contains: validSearch, mode: "insensitive" }
         },
-        include: { responses: true, author: true },
+        include: PRISMA_INCLUDE,
         take: limit
     });
 }
@@ -44,7 +67,7 @@ async function getDefaultLists(limit: number) {
     return await prisma.list.findMany({
         take: limit,
         orderBy: { createdAt: "desc" },
-        include: { responses: true, author: true }
+        include: PRISMA_INCLUDE
     });
 }
 
@@ -104,7 +127,7 @@ export async function POST(request: Request) {
     const list = await prisma.list.create({
         data: {
             name: title,
-            authorId: authorId || undefined,
+            authorId: authorId,
         },
     });
 
@@ -112,7 +135,7 @@ export async function POST(request: Request) {
         data: {
             content: JSON.stringify(items),
             listId: list.id,
-            userId: authorId || undefined,
+            userId: authorId,
         },
     });
 

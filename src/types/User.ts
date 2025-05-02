@@ -7,6 +7,7 @@ export type User = {
     role: Roles;
     createdLists: any[];
     responses: any[];
+    badges: Badge[];
     createdListCount: number;
     responseCount: number;
     createdAt: Date;
@@ -32,3 +33,8 @@ export type Response = {
     list: List;
     user: User;
 };
+
+export type Badge = {
+    content: string;
+    color: string;
+}

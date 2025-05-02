@@ -22,7 +22,7 @@ export default async function Home() {
                         <p className="text-lg text-gray-600">No lists available.</p>
                     ) : (
                         lists.map((list: any) => (
-                            <ListComponent key={list.id} list={list}/>
+                            <ListComponent key={list.id} list={list} response={list.responses[0]}/>
                         ))
                     )}
                 </div>

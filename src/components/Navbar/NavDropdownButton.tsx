@@ -1,6 +1,16 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
-import DropdownLogoutButton from "./DropdownLogoutButton";
+import { Roles } from "@/types/Roles";
+
+function DropdownButton({ text, href, disabled=false }: { text: string; href: string; disabled?: boolean }) {
+    return (
+        disabled ? (
+            <span className="block px-4 py-2 text-gray-400 text-center cursor-not-allowed">{text}</span>
+        ) : (
+            <a href={href} className="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-center">{text}</a>
+        )
+    );
+}
 
 export default function NavDropdownButton({ user }: { user: any }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -47,9 +57,12 @@ export default function NavDropdownButton({ user }: { user: any }) {
             </button>
             {isOpen && (
                 <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 min-w-[8rem] bg-white border border-gray-300 rounded shadow-lg z-50">
-                    <a href="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-center">Profile</a>
-                    <span className="block px-4 py-2 text-gray-400 text-center cursor-not-allowed">Settings</span>
-                    <a href="/logout" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-center">Logout</a>
+                    <DropdownButton text="Profile" href="/profile" />
+                    <DropdownButton text="Settings" href="/settings" disabled />
+                    {user.role == Roles.ADMIN && (
+                        <DropdownButton text="Admin" href="/admin" disabled />
+                    )}
+                    <DropdownButton text="Logout" href="/logout" />
                 </div>
             )}
         </div>

@@ -1,4 +1,6 @@
+import filter from "@/lib/filter";
 import { prisma } from "@/lib/prisma";
+import Snowflake from "@/lib/snowflake";
 import { roleFromString, Roles } from "@/types/Roles";
 import { User } from "@/types/User";
 
@@ -35,7 +37,13 @@ export async function getUser(userId?: string | null, userName?: string | null):
                                     } },
                                     { userId: userId || undefined }
                                 ]
-                            }
+                            },
+                            include: { user: {
+                                omit: {
+                                    email: true,
+                                    emailVerified: true,
+                                }
+                            }},
                         },
                     },
                     take: 3,
@@ -51,12 +59,30 @@ export async function getUser(userId?: string | null, userName?: string | null):
                         }
                     },
                     include: {
-                        list: true,
+                        list: {
+                            include: {
+                                author: {
+                                    omit: {
+                                        email: true,
+                                        emailVerified: true,
+                                    }
+                                },
+                            },
+                        },
+                        user: {
+                            omit: {
+                                email: true,
+                                emailVerified: true,
+                            }
+                        }
                     },
                     omit: {
                         listId: true,
                     },
                     take: 5,
+                },
+                badges: {
+                    omit: { id: true }
                 },
             },
         }),
@@ -98,6 +124,7 @@ export async function getUser(userId?: string | null, userName?: string | null):
         name: user.name || null,
         image: user.image || null,
         role: roleFromString(user.role) || Roles.USER,
+        badges: user.badges,
         createdLists: user.createdLists,
         responses: user.responses,
         createdListCount,
@@ -121,22 +148,7 @@ export async function GET(req: Request) {
     const user = await getUser(userId, userName);
 
     if (!user) return new Response("User not found", { status: 404 });
-    const userResponse = { ...user };
-
-    if (exclude) {
-        console.log(exclude);
-        exclude.split(' ').forEach(field => {
-            delete (userResponse as Record<string, any>)[field.trim()];
-        });
-    } else if (include) {
-        console.log(include);
-        const includeList = include.split(' ');
-        Object.keys(userResponse).forEach(key => {
-            if (!includeList.includes(key)) {
-                delete (userResponse as Record<string, any>)[key];
-            }
-        });
-    }
+    const userResponse = filter(user, include?.split(" "), exclude?.split(" "));
 
     return new Response(JSON.stringify(userResponse), { status: 200, headers: { "Content-Type": "application/json" } });
 }
