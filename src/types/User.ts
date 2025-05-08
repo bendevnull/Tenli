@@ -17,21 +17,22 @@ export type User = {
 export type List = {
     id: string;
     name: string;
-    author?: User;
+    author?: any;
     createdAt: Date;
     updatedAt: Date;
-    responses: Response[];
+    responses: any[];
+    responseCount?: number;
 };
 
 export type Response = {
     id: string;
     listId: string;
-    userId: string;
+    userId?: string | null;
     content: string;
     createdAt: Date;
     updatedAt: Date;
-    list: List;
-    user: User;
+    list?: List;
+    user: User | null;
 };
 
 export type Badge = {

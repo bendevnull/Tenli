@@ -6,28 +6,25 @@ import { User } from "@/types/User";
 export type AuthResponse = {
     status: number;
     redirect: string | null;
-    session: User | null;
+    user: User | null;
 };
 
-export async function requireAuth(redirectPath: string = "/login", requiredRole?: Roles, callback: string = "/"): Promise<AuthResponse> {
-    const { searchParams } = new URL(window.location.href);
-    callback = searchParams.get("callbackUrl") || callback;
-    
+export async function requireAuth(redirect: string, requiredRole?: Roles, redirectUrl: string = "/login"): Promise<AuthResponse> {
     const session = await auth();
 
     if (!session) {
-        return { status: 401, redirect: `${redirectPath}?redirect=${callback}`, session: null };
+        return { status: 401, redirect: `${redirectUrl}?redirect=${redirect}`, user: null };
     }
 
-    const user = await getUser(session.user?.id);
+    const user = await getUser(session.user?.name);
 
     if (!user) {
-        return { status: 500, redirect: "/error/500", session: null };
+        return { status: 500, redirect: "/error/500", user: null };
     }
 
     if (requiredRole && (user.role != requiredRole)) {
-        return { status: 403, redirect: "/error/403", session: user };
+        return { status: 403, redirect: "/error/403", user };
     }
 
-    return { status: 200, redirect: null, session: user };
+    return { status: 200, redirect: null, user };
 }

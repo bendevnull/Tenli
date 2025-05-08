@@ -9,58 +9,57 @@ export async function GET(request: Request, { params }: { params: { id: string }
     const page = searchParams.get("page") || "1";
     const limit = searchParams.get("limit") || "10";
     const user = searchParams.get("user");
+    const excludeAuthorResponses = searchParams.get("excludeAuthorResponses") != "false";
     const include = searchParams.get("include");
     const exclude = searchParams.get("exclude");
 
-    const [ list, totalCount ] = await prisma.$transaction([
-        prisma.list.findUnique({
+    const list = await prisma.list.findUnique({
+        where: {
+            id: listId,
+        },
+        include: {
+            author: true,
+        },
+    });
+
+    if (!list) { return Response.json({ error: "List not found" }, { status: 404 }); }
+
+    const [ responses, totalCount ] = await prisma.$transaction([
+        prisma.response.findMany({
             where: {
-                id: listId,
+                listId,
+                ...(user && { user: { name: { equals: user, mode: "insensitive" } } }),
+                ...(excludeAuthorResponses && { userId: { not: list?.authorId } }),
             },
             include: {
-                author: true,
-                responses: {
-                    where: {
-                        user: {
-                            name: {
-                                equals: user || undefined,
-                                mode: "insensitive",
-                            }
-                        }
-                    },
-                    include: {
-                        user: {
-                            omit: {
-                                email: true,
-                                emailVerified: true,
-                            }
-                        },
-                    },
+                user: {
                     omit: {
-                        listId: true,
-                    },
-                    orderBy: {
-                        // newest first
-                        createdAt: "asc",
-                    },
-                    take: parseInt(limit),
-                    skip: (parseInt(page) - 1) * parseInt(limit),
-                }
-            }
+                        email: true,
+                        emailVerified: true,
+                    }
+                },
+            },
+            orderBy: {
+                createdAt: "asc",
+            },
+            take: parseInt(limit),
+            skip: (parseInt(page) - 1) * parseInt(limit),
         }),
         prisma.response.count({
             where: {
                 listId,
+                ...(user && { user: { name: { equals: user, mode: "insensitive" } } }),
+                ...(excludeAuthorResponses && { userId: { not: list?.authorId } }),
             }
         })
-    ]);
+    ])
 
     if (!list) {
         return new Response("List not found", { status: 404 });
     }
 
     const response = filter({
-        responses: list.responses,
+        responses,
         pageCount: Math.ceil(totalCount / parseInt(limit)),
         page: parseInt(page),
         limit: parseInt(limit),
@@ -97,25 +96,25 @@ export async function POST(request: Request, { params }: { params: { id: string 
     });
 
     if (!authorId) {
-        return new Response("Unauthorized", { status: 401 });
+        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
     }
     if (!listId) {
-        return new Response("List ID is required", { status: 400 });
+        return new Response(JSON.stringify({ error: "List ID is required" }), { status: 400, headers: { "Content-Type": "application/json" } });
     }
     if (items.length > 10 || items.length < 10) {
-        return new Response("You must add 10 items", { status: 400 });
+        return new Response(JSON.stringify({ error: "You must add 10 items" }), { status: 400, headers: { "Content-Type": "application/json" } });
     }
     if (items.some(item => item.length < 3)) {
-        return new Response("Each item must be at least 3 characters long", { status: 400 });
+        return new Response(JSON.stringify({ error: "Each item must be at least 3 characters long" }), { status: 400, headers: { "Content-Type": "application/json" } });
     }
     if (items.some(item => item.length > 100)) {
-        return new Response("Each item must be at most 100 characters long", { status: 400 });
+        return new Response(JSON.stringify({ error: "Each item must be at most 100 characters long" }), { status: 400, headers: { "Content-Type": "application/json" } });
     }
     if (!list) {
-        return new Response("List not found", { status: 404 });
+        return new Response(JSON.stringify({ error: "List not found" }), { status: 404, headers: { "Content-Type": "application/json" } });
     }
     if (existingResponse || list.authorId === authorId) {
-        return new Response("You have already responded to this list", { status: 400 });
+        return new Response(JSON.stringify({ error: "You have already responded to this list" }), { status: 400, headers: { "Content-Type": "application/json" } });
     }
     
     const response = await prisma.response.create({

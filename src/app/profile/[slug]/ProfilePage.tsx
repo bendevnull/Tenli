@@ -1,7 +1,4 @@
 "use client";
-import { useSessionUser } from "@/hooks/useSessionUser";
-import { use, useEffect, useState } from "react";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import { redirect, useSearchParams } from "next/navigation";
 import { Badge, List, User } from "@/types/User";
 import ListComponent from "@/components/List";
@@ -145,7 +142,7 @@ function UserBadges({ user }: { user: User }) {
     return (
         <div className="flex flex-wrap">
             {badges.map((badge, index) => (
-                <BadgeComponent key={index} text={badge.text} color={badge.color} className={index > 0 ? "ml-1 lg:visible md:invisible sm:visible" : undefined} />
+                <BadgeComponent key={index} text={badge.text} color={badge.color} />
             ))}
         </div>
     );
@@ -189,62 +186,12 @@ function Responses({ user, possessive }: { user: User, possessive: string }) {
     )
 }
 
-export default function ProfilePage() {
-    const searchParams = useSearchParams();
-
-    const name = searchParams?.get("name");
-    const id = searchParams?.get("id");
-
-    const [user, setUser] = useState<User | null>(null);
-    const session = useSessionUser();
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        async function fetchUser() {
-            let response;
-            if (id) {
-                response = await fetch(`/api/user?id=${id}`);
-            } else if (name) {
-                response = await fetch(`/api/user?name=${name}`);
-            } else if (session?.user?.id) {
-                response = await fetch(`/api/user?id=${session.user.id}`);
-            } else {
-                return;
-            }
-
-            if (!response.ok) {
-                console.error("Failed to fetch user data");
-                setLoading(false);
-                return;
-            }
-
-            const data = await response.json();
-            console.log("User data:", data);
-            setUser(data);
-            setLoading(false);
-        }
-
-        fetchUser();
-    }, [session?.user]);
-
-    if (loading || session.userLoading) {
-        return <LoadingSpinner />;
-    }
-
-    if (!user && !session.user) {
-        return redirect("/login");
-    }
-
+export default function ProfilePage({ user, sessionUser }: { user: User | null, sessionUser: User | null }) {
     if (!user) {
-        return <p>User not found.</p>;
+        redirect("/error/404");
     }
 
-    function calculatePossessive(user: User, sessionUser: User) {
-        if (user.id === sessionUser.id) return "My";
-        return user.name + "'s";
-    }
-
-    const possessive = calculatePossessive(user, session.user);
+    const possessive = user.id === sessionUser?.id ? "My" : user.name + "'s";
 
     return (
         // two columns on larger screens, single column on mobile

@@ -57,7 +57,7 @@ export default function NavDropdownButton({ user }: { user: any }) {
             </button>
             {isOpen && (
                 <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 min-w-[8rem] bg-white border border-gray-300 rounded shadow-lg z-50">
-                    <DropdownButton text="Profile" href="/profile" />
+                    <DropdownButton text="Profile" href={`/profile/${user.name}`} />
                     <DropdownButton text="Settings" href="/settings" disabled />
                     {user.role == Roles.ADMIN && (
                         <DropdownButton text="Admin" href="/admin" disabled />

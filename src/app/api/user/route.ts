@@ -4,17 +4,11 @@ import Snowflake from "@/lib/snowflake";
 import { roleFromString, Roles } from "@/types/Roles";
 import { User } from "@/types/User";
 
-export async function getUser(userId?: string | null, userName?: string | null): Promise<User | null> {
+export async function getUser(userName?: string | null): Promise<User | null> {
     const [ user, createdListCount, responseCount ] = await prisma.$transaction([
         prisma.user.findFirst({
             where: {
-                OR: [
-                    { id: userId || undefined },
-                    { name: {
-                        equals: userName || undefined,
-                        mode: "insensitive"
-                    }},
-                ],
+                name: { equals: userName },
             },
             omit: {
                 email: true,
@@ -30,12 +24,7 @@ export async function getUser(userId?: string | null, userName?: string | null):
                         responses: {
                             where: {
                                 OR: [
-                                    { user: {
-                                        name: {
-                                            equals: userName || undefined
-                                        }
-                                    } },
-                                    { userId: userId || undefined }
+                                    { user: { name: { equals: userName, mode: "insensitive" } } },
                                 ]
                             },
                             include: { user: {
@@ -53,8 +42,7 @@ export async function getUser(userId?: string | null, userName?: string | null):
                     where: {
                         NOT: {
                             list: {
-                                authorId: userId || undefined,
-                                author: { name: userName || undefined }
+                                author: { name: { equals: userName, mode: "insensitive" } }
                             }
                         }
                     },
@@ -88,29 +76,17 @@ export async function getUser(userId?: string | null, userName?: string | null):
         }),
         prisma.list.count({
             where: {
-                author: {
-                    id: {
-                        equals: userId || undefined
-                    },
-                    name: {
-                        equals: userName || undefined,
-                        mode: "insensitive"
-                    }
-                }
+                author: { name: { equals: userName, mode: "insensitive" } }
             },
         }),
         prisma.response.count({
             where: {
                 OR: [
-                    { userId: userId || undefined },
-                    { user: { name: { equals: userName || undefined, mode: "insensitive" } } }
+                    { user: { name: { equals: userName, mode: "insensitive" } } }
                 ],
                 NOT: {
                     list: {
-                        OR: [
-                            { authorId: userId || undefined },
-                            { author: { name: { equals: userName || undefined, mode: "insensitive" } } }
-                        ]
+                        author: { name: { equals: userName, mode: "insensitive" } }
                     }
                 }
             },
@@ -135,19 +111,18 @@ export async function getUser(userId?: string | null, userName?: string | null):
 }
 
 export async function GET(req: Request) {
-    const searchParams = new URL(req.url).searchParams;
-    const userId = searchParams.get("id");
+    const { searchParams } = new URL(req.url);
     const userName = searchParams.get("name");
     const exclude = searchParams.get("exclude");
     const include = searchParams.get("include");
 
-    if (!userId && !userName) {
-        return new Response("User ID or name is required", { status: 400 });
+    if (!userName) {
+        return new Response(JSON.stringify({error: "User name is required"}), { status: 400 });
     }
 
-    const user = await getUser(userId, userName);
+    const user = await getUser(userName);
 
-    if (!user) return new Response("User not found", { status: 404 });
+    if (!user) return new Response(JSON.stringify({error: "User not found"}), { status: 404 });
     const userResponse = filter(user, include?.split(" "), exclude?.split(" "));
 
     return new Response(JSON.stringify(userResponse), { status: 200, headers: { "Content-Type": "application/json" } });

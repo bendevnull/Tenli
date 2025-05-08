@@ -55,9 +55,20 @@ export const metadata: Metadata = {
     },
     openGraph: {
         // type: "website",
-        title: `Tenli${process.env.NODE_ENV === "development" ? " (Development Beta)" : ""}`,
+        title: {
+            default: `Tenli${
+                process.env.NODE_ENV === "development"
+                    ? " (Development Beta)"
+                    : ""
+            }`,
+            template: `%s | Tenli${
+                process.env.NODE_ENV === "development"
+                    ? " (Development Beta)"
+                    : ""
+            }`,
+        },
         description: "Your collection of top ten lists.",
-        url: process.env.NODE_ENV === "development" ? "https://beta.tenliapp.com" : "https://tenliapp.com",
+        url: "/",
         siteName: "Tenli",
         images: [{ url: "/tenli-square.png" }],
     },

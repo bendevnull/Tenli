@@ -20,6 +20,7 @@ const PRISMA_INCLUDE = {
         omit: {
             userId: true,
         },
+        take: 1
     },
     author: {
         omit: {
@@ -29,45 +30,53 @@ const PRISMA_INCLUDE = {
     },
 };
 
-async function getAuthorLists(authorId: string, limit: number, validSearch: string | null, random: boolean) {
+async function getAuthorLists(authorId: string, limit: number, validSearch: string | null, random: boolean, page: number = 1) {
     const authorLists = await prisma.list.findMany({
         where: { authorId: { equals: authorId } },
-        include: PRISMA_INCLUDE
+        include: PRISMA_INCLUDE,
+        take: limit,
+        skip: (page - 1) * limit,
     });
 
     if (random) {
-        return authorLists.sort(() => 0.5 - Math.random()).slice(0, limit);
+        return authorLists.sort(() => 0.5 - Math.random());
     }
 
     if (validSearch) {
         return authorLists.filter(list =>
             list.name.toLowerCase().includes(validSearch.toLowerCase())
-        ).slice(0, limit);
+        );
     }
 
-    return authorLists.slice(0, limit);
+    return authorLists;
 }
 
 async function getRandomLists(limit: number) {
-    const dbLists = await prisma.list.findMany({ take: MAX_LIMIT, include: PRISMA_INCLUDE });
+    const dbLists = await prisma.list.findMany({
+        take: MAX_LIMIT,
+        include: PRISMA_INCLUDE,
+        skip: Math.max(0, Math.floor(Math.random() * Math.max(0, (await prisma.list.count()) - MAX_LIMIT))),
+    });
     return dbLists.sort(() => 0.5 - Math.random()).slice(0, limit);
 }
 
-async function getSearchedLists(validSearch: string, limit: number) {
+async function getSearchedLists(validSearch: string, limit: number, page: number = 1) {
     return await prisma.list.findMany({
         where: {
             name: { contains: validSearch, mode: "insensitive" }
         },
         include: PRISMA_INCLUDE,
-        take: limit
+        take: limit,
+        skip: (page - 1) * limit,
     });
 }
 
-async function getDefaultLists(limit: number) {
+export async function getDefaultLists(limit: number, page = 1) {
     return await prisma.list.findMany({
         take: limit,
         orderBy: { createdAt: "desc" },
-        include: PRISMA_INCLUDE
+        include: PRISMA_INCLUDE,
+        skip: (page - 1) * limit
     });
 }
 
@@ -78,6 +87,7 @@ export async function GET(request: NextApiRequest) {
     const validSearch = search && search.length >= 3 ? search : null;
     const random = query.get("random") ? true : false;
     const authorId = query.get("authorId") ? query.get("authorId") : null;
+    const page = query.get("page") ? parseInt(query.get("page") as string) : 1;
 
     let lists;
 
