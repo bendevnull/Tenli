@@ -18,9 +18,6 @@ export async function GET(req: NextRequest, { params }: { params: { user: string
         method: "GET",
         headers: {
             "Content-Type": "image/png",
-            "Cache-Control": "no-cache",
-            "Pragma": "no-cache",
-            "Expires": "0",
         },
     });
     if (!response.ok) {
@@ -32,9 +29,8 @@ export async function GET(req: NextRequest, { params }: { params: { user: string
         status: 200,
         headers: {
             "Content-Type": "image/png",
-            "Cache-Control": "no-cache",
-            "Pragma": "no-cache",
-            "Expires": "0",
+            // Cache for 1 hour to reduce external API calls
+            "Cache-Control": "public, max-age=3600, s-maxage=3600",
             "Content-Disposition": `inline; filename=${user.name}.png`,
         },
     });

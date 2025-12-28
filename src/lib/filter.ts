@@ -1,17 +1,21 @@
 export default function filter(object: any, include?: string[], exclude?: string[]) {
-    var filteredObject = { ...object };
-    
     if (exclude) {
-        exclude.forEach(field => {
-            delete (filteredObject as Record<string, any>)[field.trim()];
-        });
-    } else if (include) {
-        Object.keys(filteredObject).forEach(key => {
-            if (!include.includes(key)) {
-                delete (filteredObject as Record<string, any>)[key];
+        // Use reduce to create a new object with excluded fields in one pass
+        return Object.keys(object).reduce((acc, key) => {
+            if (!exclude.includes(key)) {
+                acc[key] = object[key];
             }
-        });
+            return acc;
+        }, {} as Record<string, any>);
+    } else if (include) {
+        // Use reduce to create a new object with only included fields in one pass
+        return include.reduce((acc, key) => {
+            if (key in object) {
+                acc[key] = object[key];
+            }
+            return acc;
+        }, {} as Record<string, any>);
     }
 
-    return filteredObject;
+    return object;
 }
