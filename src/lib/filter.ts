@@ -10,15 +10,15 @@ export default function filter(object: any, include?: string[], exclude?: string
         }, {} as Record<string, any>);
     } else if (include) {
         // Use Set for O(1) lookup instead of O(n) array.includes()
-        const includeSet = new Set(include);
-        return includeSet.size > 0 
-            ? Array.from(includeSet).reduce((acc, key) => {
-                if (key in object) {
-                    acc[key] = object[key];
-                }
-                return acc;
-            }, {} as Record<string, any>)
-            : {};
+        // Trim whitespace for consistency with exclude handling
+        const includeSet = new Set(include.map(field => field.trim()));
+        // Iterate over object keys and check if they're in the include set
+        return Object.keys(object).reduce((acc, key) => {
+            if (includeSet.has(key)) {
+                acc[key] = object[key];
+            }
+            return acc;
+        }, {} as Record<string, any>);
     }
 
     return object;

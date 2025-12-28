@@ -10,10 +10,9 @@ export default class Snowflake {
             if (Snowflake.sequence === 0) {
                 // Wait for the next millisecond if sequence overflows
                 // Use async wait instead of busy-wait to avoid blocking the event loop
+                // Calculate delay at the time of setTimeout to avoid race conditions
                 await new Promise(resolve => {
-                    const waitUntil = Snowflake.lastTimestamp + 1;
-                    const delay = waitUntil - Date.now();
-                    setTimeout(resolve, Math.max(0, delay));
+                    setTimeout(resolve, Math.max(0, Snowflake.lastTimestamp + 1 - Date.now()));
                 });
                 timestamp = Date.now();
             }
