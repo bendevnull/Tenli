@@ -1,20 +1,24 @@
 export default function filter(object: any, include?: string[], exclude?: string[]) {
     if (exclude) {
-        // Use reduce to create a new object with excluded fields in one pass
+        // Use Set for O(1) lookup instead of O(n) array.includes()
+        const excludeSet = new Set(exclude.map(field => field.trim()));
         return Object.keys(object).reduce((acc, key) => {
-            if (!exclude.includes(key)) {
+            if (!excludeSet.has(key)) {
                 acc[key] = object[key];
             }
             return acc;
         }, {} as Record<string, any>);
     } else if (include) {
-        // Use reduce to create a new object with only included fields in one pass
-        return include.reduce((acc, key) => {
-            if (key in object) {
-                acc[key] = object[key];
-            }
-            return acc;
-        }, {} as Record<string, any>);
+        // Use Set for O(1) lookup instead of O(n) array.includes()
+        const includeSet = new Set(include);
+        return includeSet.size > 0 
+            ? Array.from(includeSet).reduce((acc, key) => {
+                if (key in object) {
+                    acc[key] = object[key];
+                }
+                return acc;
+            }, {} as Record<string, any>)
+            : {};
     }
 
     return object;
