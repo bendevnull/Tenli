@@ -31,33 +31,51 @@ const PRISMA_INCLUDE = {
 };
 
 async function getAuthorLists(authorId: string, limit: number, validSearch: string | null, random: boolean, page: number = 1) {
+    const where: any = { authorId: { equals: authorId } };
+    
+    // Add search filter at database level
+    if (validSearch) {
+        where.name = { contains: validSearch, mode: "insensitive" };
+    }
+
     const authorLists = await prisma.list.findMany({
-        where: { authorId: { equals: authorId } },
+        where,
         include: PRISMA_INCLUDE,
         take: limit,
         skip: (page - 1) * limit,
     });
 
+    // Only sort randomly if requested (still in-memory but unavoidable for random)
     if (random) {
         return authorLists.sort(() => 0.5 - Math.random());
-    }
-
-    if (validSearch) {
-        return authorLists.filter(list =>
-            list.name.toLowerCase().includes(validSearch.toLowerCase())
-        );
     }
 
     return authorLists;
 }
 
 async function getRandomLists(limit: number) {
+    const totalCount = await prisma.list.count();
+    
+    // If there are fewer lists than MAX_LIMIT, just fetch all and randomize
+    if (totalCount <= MAX_LIMIT) {
+        const dbLists = await prisma.list.findMany({
+            include: PRISMA_INCLUDE,
+        });
+        return dbLists.sort(() => 0.5 - Math.random()).slice(0, limit);
+    }
+    
+    // Otherwise, use a random offset to get different lists each time
+    const maxOffset = Math.max(0, totalCount - limit);
+    const randomOffset = Math.floor(Math.random() * maxOffset);
+    
     const dbLists = await prisma.list.findMany({
-        take: MAX_LIMIT,
+        take: limit,
+        skip: randomOffset,
         include: PRISMA_INCLUDE,
-        skip: Math.max(0, Math.floor(Math.random() * Math.max(0, (await prisma.list.count()) - MAX_LIMIT))),
     });
-    return dbLists.sort(() => 0.5 - Math.random()).slice(0, limit);
+    
+    // Shuffle the results for better randomness
+    return dbLists.sort(() => 0.5 - Math.random());
 }
 
 async function getSearchedLists(validSearch: string, limit: number, page: number = 1) {
@@ -92,13 +110,13 @@ export async function GET(request: NextApiRequest) {
     let lists;
 
     if (authorId) {
-        lists = await getAuthorLists(authorId, limit, validSearch, random);
+        lists = await getAuthorLists(authorId, limit, validSearch, random, page);
     } else if (random) {
         lists = await getRandomLists(limit);
     } else if (validSearch) {
-        lists = await getSearchedLists(validSearch, limit);
+        lists = await getSearchedLists(validSearch, limit, page);
     } else {
-        lists = await getDefaultLists(limit);
+        lists = await getDefaultLists(limit, page);
     }
 
     return new Response(JSON.stringify(lists), { status: 200, headers: { "Content-Type": "application/json" } });

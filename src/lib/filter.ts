@@ -1,17 +1,25 @@
 export default function filter(object: any, include?: string[], exclude?: string[]) {
-    var filteredObject = { ...object };
-    
     if (exclude) {
-        exclude.forEach(field => {
-            delete (filteredObject as Record<string, any>)[field.trim()];
-        });
-    } else if (include) {
-        Object.keys(filteredObject).forEach(key => {
-            if (!include.includes(key)) {
-                delete (filteredObject as Record<string, any>)[key];
+        // Use Set for O(1) lookup instead of O(n) array.includes()
+        const excludeSet = new Set(exclude.map(field => field.trim()));
+        return Object.keys(object).reduce((acc, key) => {
+            if (!excludeSet.has(key)) {
+                acc[key] = object[key];
             }
-        });
+            return acc;
+        }, {} as Record<string, any>);
+    } else if (include) {
+        // Use Set for O(1) lookup instead of O(n) array.includes()
+        // Trim whitespace for consistency with exclude handling
+        const includeSet = new Set(include.map(field => field.trim()));
+        // Iterate over object keys and check if they're in the include set
+        return Object.keys(object).reduce((acc, key) => {
+            if (includeSet.has(key)) {
+                acc[key] = object[key];
+            }
+            return acc;
+        }, {} as Record<string, any>);
     }
 
-    return filteredObject;
+    return object;
 }
